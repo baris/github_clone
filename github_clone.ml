@@ -1,6 +1,5 @@
 (*
-  github_clone USER TARGET_DIR
-  Backup USER's public repositories to TARGET_DIR
+  Backup one's public repositories to a directory
 
   Baris Metin <baris ! metin.org>
 *)
@@ -11,6 +10,20 @@ open Shell
 open Json_io
 open Json_type.Browse
 open Http_client.Convenience
+
+let usage_msg = 
+  "\nUsage: github_clone -u USER [-owner] [SYNC_DIRECTORY]\n" ^
+  "Backup USER's public github repositories locally.\n" 
+
+let is_owner = ref false
+let github_user = ref ""
+let sync_dir = ref "."
+
+let optionspeclist = 
+  [ 
+    ("-owner", Arg.Set (is_owner), "Checkout projects as the owner");
+    ("-u", Arg.Set_string (github_user), "Github username");
+  ]
 
 
 (* get name from json object *)
@@ -35,7 +48,11 @@ class github user =
       let repos_url = String.concat "/" [api_url; "repos/show"; user] in
       self#get repos_url
         
-    method url repo = "git@github.com:" ^ user ^ "/" ^ repo ^ ".git"
+    method url repo = 
+      if !is_owner then
+        "git@github.com:" ^ user ^ "/" ^ repo ^ ".git"
+      else
+        "git://github.com/" ^ user ^ "/" ^ repo ^ ".git"
 
     method repo_names =
       (* return public repositories of a user as a list *)
@@ -52,6 +69,7 @@ class github user =
       let target_workdir = String.concat "/" [target_dir;repo]
       and repo_url = self#url repo in
       print_endline ("Working on " ^ target_workdir);
+      print_endline repo_url;
       if Sys.file_exists target_workdir && Sys.is_directory target_workdir then
         begin
           let cur_dir = Sys.getcwd () in
@@ -67,27 +85,23 @@ class github user =
   end
 
 
-let usage () =
-  printf "%s USER TARGET_DIR\n" Sys.argv.(0)
-
 
 let () = 
-  if Array.length Sys.argv <> 3 then
+  Arg.parse optionspeclist (fun x -> sync_dir := x) usage_msg;
+  
+  if !github_user = "" then
     begin
-      usage ();
+      Arg.usage optionspeclist usage_msg;
       exit 1
     end;
-      
-  let user = Sys.argv.(1) in
-  let target_dir = Sys.argv.(2) in
 
-  let g = new github user in
+  let g = new github !github_user in
   let rec clone_all repos = 
     match repos with
       [] -> ()
     | repo::repos' ->
         begin
-          g#clone repo target_dir;
+          g#clone repo !sync_dir;
           clone_all repos'
         end
   in
