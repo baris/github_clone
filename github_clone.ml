@@ -1,4 +1,3 @@
-(* ocamlfind opt -package "netclient json-wheel str shell" -linkpkg github.ml -o github *)
 
 open List
 open Printf
