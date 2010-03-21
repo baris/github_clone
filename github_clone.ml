@@ -1,3 +1,9 @@
+(*
+  github_clone USER TARGET_DIR
+  Backup USER's public repositories to TARGET_DIR
+
+  Baris Metin <baris ! metin.org>
+*)
 
 open List
 open Printf
