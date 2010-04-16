@@ -4,7 +4,6 @@
   Baris Metin <baris ! metin.org>
 *)
 
-open List
 open Printf
 open Shell
 open Json_io
@@ -28,9 +27,9 @@ let optionspeclist =
 
 (* get name from json object *)
 let get_field_from json name =
-  hd
-    (map (fun (x,y) -> string y)
-       (filter (fun (x,y) -> x = name) (objekt json)))
+  List.hd
+    (List.map (fun (x,y) -> string y)
+       (List.filter (fun (x,y) -> x = name) (objekt json)))
 
 
 class github user =
