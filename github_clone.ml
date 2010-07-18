@@ -73,7 +73,9 @@ class github user =
         begin
           let cur_dir = Sys.getcwd () in
           Sys.chdir target_workdir;
-          call [ cmd "git" ["pull"; "origin"; "master"] ];
+          call [ cmd "git" ["fetch"; "origin"] ];
+          call [ cmd "git" ["fetch"; "origin"; "--tags"] ];
+          call [ cmd "git" ["merge"; "origin/master"] ];
           Sys.chdir cur_dir
         end
       else
