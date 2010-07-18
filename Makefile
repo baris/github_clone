@@ -1,9 +1,20 @@
+
+PROGNAME=github_clone
+FILES=github_clone.ml
 MODULES="netclient json-wheel str shell"
 
-all: github_clone
 
-github_clone: github_clone.ml
-	ocamlfind opt -package $(MODULES) -linkpkg github_clone.ml -o github_clone
+all: opt
+
+opt: $(FILES)
+	ocamlfind opt -package $(MODULES) -linkpkg $(FILES) -o $(PROGNAME)
+
+byte: $(FILES)
+	ocamlfind c -package $(MODULES) -linkpkg $(FILES) -o $(PROGNAME)
+
+
+FILENAMES := $(patsubst %.mli,%,$(FILES))
+FILENAMES := $(patsubst %.ml,%,$(FILENAMES))
 
 clean:
-	rm -f github_clone.cm[xi] github_clone.o github_clone
+	$(foreach filename, $(FILENAMES), rm -rf ${filename}{,.cmi,.cmo,.cmx,.o})
