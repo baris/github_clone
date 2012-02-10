@@ -8,6 +8,8 @@ import logging
 import optparse
 import subprocess
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+
 class Github(object):
     def __init__(self, options):
         self.api_url = "http://github.com/api/v2/json"
