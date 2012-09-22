@@ -4,7 +4,8 @@ FILES=github_clone.ml
 MODULES="netclient json-wheel str shell"
 
 
-all: opt
+all:
+	@echo "ocaml implementation is not maintained anymore"
 
 opt: $(FILES)
 	ocamlfind opt -package $(MODULES) -linkpkg $(FILES) -o $(PROGNAME)

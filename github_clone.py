@@ -12,27 +12,24 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(mes
 
 class Github(object):
     def __init__(self, options):
-        self.api_url = "http://github.com/api/v2/json"
+        self.api_url = "https://api.github.com"
         self.opt = options
 
     def get(self, url):
         return urllib.urlopen(url).read()
 
-    def user(self):
-        return self.get("/".join([self.api_url, "user/show", self.opt.username]))
-
     def repos(self):
-        return self.get("/".join([self.api_url, "repos/show", self.opt.username]))
+        return self.get("/".join([self.api_url, "users/%s/repos" % self.opt.username]))
 
     def url(self, repo):
         if self.opt.owner:
             return "git@github.com:%s/%s.git" % (self.opt.username, repo)
         else:
-            return "git://github.com/%s/%s.git" % (self.opt.username, repo)
+            return "https://github.com/%s/%s.git" % (self.opt.username, repo)
 
     def repo_names(self):
         repos = json.loads(self.repos())
-        return [repo["name"] for repo in repos["repositories"]]
+        return [repo["name"] for repo in repos]
 
     def clone(self, repo, target):
         target_workdir = os.path.join(target, repo)
